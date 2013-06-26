@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, url_for, redirect
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -18,16 +18,38 @@ def add_todo(text):
 	db.session.commit()
 	print 'adding todo:', text
 
+def mask_as_done(id):
+	todo = Todo.query.get(id)
+	todo.done = True
+	db.session.commit()
+	print 'mark as done:', id
+
+def delete_todo(id):
+	todo = Todo.query.get(id)
+	db.session.delete(todo)
+	db.session.commit()
+	print 'delete:', id
+
 db.create_all()
 @app.route('/')
 def homepage():
-	return render_template('home.html', app_name=';/', author='Helios')
+	return render_template('home.html', tasks=Todo.query.all())
 
-@app.route('/add', methods=('GET', 'POST'))
+@app.route('/addtask', methods=('GET', 'POST'))
 def add():
 	if request.method == 'POST':
 		taskname = request.form['taskname']
 		add_todo(taskname)
 	return render_template('add.html')
+
+@app.route('/done/<int:task_id>')
+def done(task_id):
+	mask_as_done(task_id)
+	return redirect(url_for('homepage'))
+
+@app.route('/delete/<int:task_id>')
+def delete(task_id):
+	delete_todo(task_id)
+	return redirect(url_for('homepage'))
 
 app.run()

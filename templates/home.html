@@ -12,5 +12,31 @@
 				<h1>Welcome~</h1>
 			</div>
 		</div>
+		<div class="row">
+			<div class="span12">
+				{% for t in tasks %}
+				<li>
+					<a href="{{ url_for('done', task_id=t.id) }}">Done</a> | 
+					<a href="{{ url_for('delete', task_id=t.id) }}">Delete</a>
+					&nbsp; 
+					{{ t.text }} [Done: {{ t.done }}]
+				</li>
+				{% endfor %}	
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+				&nbsp;
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+				<a href="{{ url_for('add') }}">Add New Task</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+			</div>
+		</div>
 	</body>
 </html>

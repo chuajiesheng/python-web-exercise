@@ -9,11 +9,28 @@
 	<body>
 		<div class="row">
   			<div class="span12">
-				<form method="POST" action="add">
+				<form method="POST" action="{{ url_for('add') }}">
 					<input type="text" name="taskname" />
 					<button type="submit">Add</button>
 				</form>
 			</div>
 		</div>
+		<div class="row">
+			<div class="span12">
+				&nbsp;
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+				<a href="{{ url_for('homepage') }}">List All</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="span12">
+				&nbsp;
+			</div>
+		</div>
+
+
 	</body>
 </html>
