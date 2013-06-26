@@ -14,6 +14,13 @@ class Todo(db.Model):
 	text = db.Column(db.String)
 	done = db.Column(db.Boolean, default=False)
 
+class People(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	username = db.Column(db.String)
+	password = db.Column(db.String)
+
+db.create_all()
+
 def add_todo(text):
 	db.session.add(Todo(text=text))
 	db.session.commit()
@@ -31,7 +38,14 @@ def delete_todo(id):
 	db.session.commit()
 	print 'delete:', id
 
-db.create_all()
+def add_user(username, password):
+	db.session.add(People(username=username, password=password))
+	db.session.commit()
+	print 'adding user:', username
+
+def check_user(username, password):
+	res = People.query.filter_by(username=username, password=password).first()
+	return res
 
 @app.before_request
 def setup():
@@ -42,6 +56,15 @@ def homepage():
 	if not session.get('username', None):
 		return redirect(url_for('loginview'))
 	return render_template('home.html', username=session.get('username', None), tasks=Todo.query.all())
+
+@app.route('/signup', methods=('GET', 'POST'))
+def signup():
+	if request.method == 'POST':
+		username = request.form['username']
+		password = request.form['password']
+		add_user(username, password)
+		return redirect(url_for('loginview'))
+	return render_template('signup.html')
 
 @app.route('/login', methods=('GET', 'POST'))
 def loginview():
