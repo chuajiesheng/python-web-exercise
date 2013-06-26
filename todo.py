@@ -1,10 +1,11 @@
 from flask import Flask
-from flask import render_template, request, url_for, redirect
+from flask import render_template, request, url_for, redirect, session, g
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.db'
+app.config['SECRET_KEY'] = 'very secret'
 
 db = SQLAlchemy(app)
 
@@ -31,9 +32,28 @@ def delete_todo(id):
 	print 'delete:', id
 
 db.create_all()
+
+@app.before_request
+def setup():
+	g.username = session.get('username', None)
+
 @app.route('/')
 def homepage():
-	return render_template('home.html', tasks=Todo.query.all())
+	if not session.get('username', None):
+		return redirect(url_for('loginview'))
+	return render_template('home.html', username=session.get('username', None), tasks=Todo.query.all())
+
+@app.route('/login', methods=('GET', 'POST'))
+def loginview():
+	if request.method == 'POST':
+		session['username'] = request.form['username']
+		return redirect(url_for('homepage'))
+	return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+	session['username'] = None
+	return redirect(url_for('loginview'))
 
 @app.route('/addtask', methods=('GET', 'POST'))
 def add():
